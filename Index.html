@@ -3,105 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengajuan Andalalin</title>
+    <title>Formulir Wizard Pengajuan Andalalin</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f4f4f9;
         }
-        form {
+        .wizard-container {
             max-width: 600px;
             margin: auto;
+            background-color: white;
             padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
-        label {
+        .wizard-step {
+            display: none;
+        }
+        .wizard-step.active {
             display: block;
-            margin-bottom: 8px;
         }
-        input, textarea, select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 12px;
+        .wizard-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
-        button {
+        .wizard-buttons button {
+            padding: 10px 20px;
             background-color: #28a745;
             color: white;
-            padding: 10px;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
         }
-        button:hover {
-            background-color: #218838;
+        .wizard-buttons button[disabled] {
+            background-color: #ccc;
+        }
+        h1 {
+            text-align: center;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .step-indicator div {
+            width: 25%;
+            padding: 10px;
+            background-color: #ddd;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .step-indicator div.active {
+            background-color: #28a745;
+            color: white;
         }
     </style>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js"></script>
-    
-    <!-- Firebase Configuration -->
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAq805s0c0FB_ZvErRi04x2GNKtZrJEax0",
-            authDomain: "trafficcounting-40188.firebaseapp.com",
-            databaseURL: "https://trafficcounting-40188-default-rtdb.firebaseio.com",
-            projectId: "trafficcounting-40188",
-            storageBucket: "trafficcounting-40188.appspot.com",
-            messagingSenderId: "381516932669",
-            appId: "1:381516932669:web:8e6d2c14621e8aed25ec54",
-            measurementId: "G-13HY42P1NZ"
-        };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // Function untuk submit data ke Firebase
-        async function submitForm(event) {
-            event.preventDefault();
-            
-            const nama = document.getElementById("nama").value;
-            const perusahaan = document.getElementById("perusahaan").value;
-            const lokasi = document.getElementById("lokasi").value;
-            const detail = document.getElementById("detail").value;
-
-            try {
-                await db.collection('pengajuan').add({
-                    nama: nama,
-                    perusahaan: perusahaan,
-                    lokasi: lokasi,
-                    detail: detail,
-                    timestamp: new Date()
-                });
-                alert('Pengajuan izin berhasil disimpan ke Firebase!');
-            } catch (error) {
-                console.error('Error saving document:', error);
-                alert('Terjadi kesalahan saat menyimpan data.');
-            }
-        }
-    </script>
 </head>
 <body>
 
-    <h1>Formulir Pengajuan Andalalin</h1>
-    
-    <form onsubmit="submitForm(event)">
-        <label for="nama">Nama Pemohon:</label>
-        <input type="text" id="nama" name="nama" required>
-        
-        <label for="perusahaan">Nama Perusahaan:</label>
-        <input type="text" id="perusahaan" name="perusahaan" required>
-        
-        <label for="lokasi">Alamat Lokasi Proyek:</label>
-        <input type="text" id="lokasi" name="lokasi" required>
-        
-        <label for="detail">Detail Proyek:</label>
-        <textarea id="detail" name="detail" rows="4" required></textarea>
-        
-        <button type="submit">Ajukan Izin</button>
-    </form>
+    <div class="wizard-container">
+        <h1>Pengajuan Andalalin</h1>
+        <div class="step-indicator">
+            <div class="step-1 active">Step 1</div>
+            <div class="step-2">Step 2</div>
+            <div class="step-3">Step 3</div>
+        </div>
+
+        <form id="wizardForm">
+
+            <!-- Step 1 -->
+            <div class="wizard-step step-1 active">
+                <label for="nama">Nama Pemohon:</label>
+                <input type="text" id="nama" name="nama" required>
+                <label for="perusahaan">Nama Perusahaan:</label>
+                <input type="text" id="perusahaan" name="perusahaan" required>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="wizard-step step-2">
+                <label for="lokasi">Alamat Lokasi Proyek:</label>
+                <input type="text" id="lokasi" name="lokasi" required>
+                <label for="detail">Detail Proyek:</label>
+                <textarea id="detail" name="detail" rows="4" required></textarea>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="wizard-step step-3">
+                <h2>Konfirmasi Data</h2>
+                <p>Periksa kembali informasi Anda sebelum mengirim formulir.</p>
+                <p id="review-nama"></p>
+                <p id="review-perusahaan"></p>
+                <p id="review-lokasi"></p>
+                <p id="review-detail"></p>
+            </div>
+
+            <div class="wizard-buttons">
+                <button type="button" id="prevBtn" onclick="navigateSteps(-1)" disabled>Kembali</button>
+                <button type="button" id="nextBtn" onclick="navigateSteps(1)">Lanjut</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function showStep(step) {
+            const steps = document.querySelectorAll('.wizard-step');
+            const indicators = document.querySelectorAll('.step-indicator div');
+            steps.forEach((element, index) => {
+                element.classList.remove('active');
+                indicators[index].classList.remove('active');
+            });
+            steps[step - 1].classList.add('active');
+            indicators[step - 1].classList.add('active');
+        }
+
+        function navigateSteps(n) {
+            const steps = document.querySelectorAll('.wizard-step');
+            if (n === 1 && !validateForm()) return false;
+            currentStep += n;
+
+            if (currentStep > steps.length) {
+                submitForm();
+                return;
+            }
+
+            if (currentStep === 1) {
+                document.getElementById('prevBtn').disabled = true;
+            } else {
+                document.getElementById('prevBtn').disabled = false;
+            }
+
+            if (currentStep === steps.length) {
+                document.getElementById('nextBtn').innerHTML = 'Kirim';
+                reviewFormData();
+            } else {
+                document.getElementById('nextBtn').innerHTML = 'Lanjut';
+            }
+
+            showStep(currentStep);
+        }
+
+        function validateForm() {
+            const currentInputs = document.querySelectorAll('.wizard-step.active input, .wizard-step.active textarea');
+            for (let i = 0; i < currentInputs.length; i++) {
+                if (currentInputs[i].value === "") {
+                    alert('Semua bidang harus diisi!');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function reviewFormData() {
+            document.getElementById('review-nama').innerText = "Nama: " + document.getElementById('nama').value;
+            document.getElementById('review-perusahaan').innerText = "Perusahaan: " + document.getElementById('perusahaan').value;
+            document.getElementById('review-lokasi').innerText = "Lokasi: " + document.getElementById('lokasi').value;
+            document.getElementById('review-detail').innerText = "Detail: " + document.getElementById('detail').value;
+        }
+
+        function submitForm() {
+            alert('Formulir telah dikirim!');
+            document.getElementById('wizardForm').submit();  // Ganti ini dengan penyimpanan ke database atau proses lain
+        }
+    </script>
 
 </body>
 </html>
