@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengajuan Andalalin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAq805s0c0FB_ZvErRi04x2GNKtZrJEax0",
+            authDomain: "trafficcounting-40188.firebaseapp.com",
+            databaseURL: "https://trafficcounting-40188-default-rtdb.firebaseio.com",
+            projectId: "trafficcounting-40188",
+            storageBucket: "trafficcounting-40188.appspot.com",
+            messagingSenderId: "381516932669",
+            appId: "1:381516932669:web:8e6d2c14621e8aed25ec54",
+            measurementId: "G-13HY42P1NZ"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Function untuk submit data ke Firebase
+        async function submitForm(event) {
+            event.preventDefault();
+            
+            const nama = document.getElementById("nama").value;
+            const perusahaan = document.getElementById("perusahaan").value;
+            const lokasi = document.getElementById("lokasi").value;
+            const detail = document.getElementById("detail").value;
+
+            try {
+                await db.collection('pengajuan').add({
+                    nama: nama,
+                    perusahaan: perusahaan,
+                    lokasi: lokasi,
+                    detail: detail,
+                    timestamp: new Date()
+                });
+                alert('Pengajuan izin berhasil disimpan ke Firebase!');
+            } catch (error) {
+                console.error('Error saving document:', error);
+                alert('Terjadi kesalahan saat menyimpan data.');
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Formulir Pengajuan Andalalin</h1>
+    
+    <form onsubmit="submitForm(event)">
+        <label for="nama">Nama Pemohon:</label>
+        <input type="text" id="nama" name="nama" required>
+        
+        <label for="perusahaan">Nama Perusahaan:</label>
+        <input type="text" id="perusahaan" name="perusahaan" required>
+        
+        <label for="lokasi">Alamat Lokasi Proyek:</label>
+        <input type="text" id="lokasi" name="lokasi" required>
+        
+        <label for="detail">Detail Proyek:</label>
+        <textarea id="detail" name="detail" rows="4" required></textarea>
+        
+        <button type="submit">Ajukan Izin</button>
+    </form>
+
+</body>
+</html>
